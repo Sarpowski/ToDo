@@ -1,23 +1,33 @@
 from fastapi import FastAPI, Depends
 from sqlalchemy.orm import Session
-from starlette.middleware.cors import CORSMiddleware
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.staticfiles import StaticFiles
 
 from .database import Base, engine, SessionLocal
 from .schemas import UserCreate, UserOut
 from . import crud
 
+# create tables
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
 
+# CORS (safe for dev / simple prod)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],   # OK for development
+    allow_origins=["*"],
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+# 🔥 SERVE FRONTEND HERE
+app.mount(
+    "/",
+    StaticFiles(directory="client", html=True),
+    name="client",
+)
 
+# dependency
 def get_db():
     db = SessionLocal()
     try:
@@ -25,6 +35,7 @@ def get_db():
     finally:
         db.close()
 
+# API endpoints
 @app.post("/users", response_model=UserOut)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
     return crud.create_user(db, user.username, user.email, user.password)
