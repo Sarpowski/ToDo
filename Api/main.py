@@ -1,7 +1,7 @@
 from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy.orm import Session
 
 from .database import Base, engine, SessionLocal
 from .schemas import UserCreate, UserOut
@@ -18,8 +18,6 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# ---------------- API ROUTES FIRST ----------------
-
 def get_db():
     db = SessionLocal()
     try:
@@ -27,21 +25,16 @@ def get_db():
     finally:
         db.close()
 
+# 🔥 API ROUTES FIRST
 @app.post("/api/users", response_model=UserOut)
 def create_user(user: UserCreate, db: Session = Depends(get_db)):
-    return crud.create_user(
-        db,
-        user.username,
-        user.email,
-        user.password
-    )
+    return crud.create_user(db, user.username, user.email, user.password)
 
 @app.get("/api/users", response_model=list[UserOut])
 def list_users(db: Session = Depends(get_db)):
     return crud.get_users(db)
 
-# ---------------- STATIC FILES LAST ----------------
-
+# 🔥 STATIC FILES LAST (VERY IMPORTANT)
 app.mount(
     "/",
     StaticFiles(directory="client", html=True),
