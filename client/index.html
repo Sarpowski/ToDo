@@ -1,0 +1,67 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>User Manager</title>
+  <link rel="stylesheet" href="./styles.css" />
+</head>
+<body>
+  <div class="container">
+    <header>
+      <h1>User Manager</h1>
+      <p class="muted">Create users and list them from FastAPI.</p>
+    </header>
+
+    <section class="card">
+      <h2>Create User</h2>
+
+      <form id="createForm">
+        <label>
+          Username
+          <input id="username" required minlength="3" placeholder="john_doe" />
+        </label>
+
+        <label>
+          Email
+          <input id="email" type="email" required placeholder="john@mail.com" />
+        </label>
+
+        <label>
+          Password
+          <input id="password" type="password" required minlength="6" placeholder="******" />
+        </label>
+
+        <div class="row">
+          <button type="submit">Create</button>
+          <button type="button" id="refreshBtn" class="secondary">Refresh list</button>
+        </div>
+
+        <div id="message" class="message"></div>
+      </form>
+    </section>
+
+    <section class="card">
+      <div class="row space">
+        <h2>Users</h2>
+        <input id="search" placeholder="Search..." />
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+          <tr>
+            <th>ID</th>
+            <th>Username</th>
+            <th>Email</th>
+          </tr>
+          </thead>
+          <tbody id="usersTbody"></tbody>
+        </table>
+      </div>
+    </section>
+  </div>
+
+  <script src="./app.js"></script>
+</body>
+</html>
