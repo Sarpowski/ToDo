@@ -1,5 +1,4 @@
-const API_BASE = "http://127.0.0.1:8000"; // FastAPI
-
+// DOM elements
 const form = document.getElementById("createForm");
 const msg = document.getElementById("message");
 const tbody = document.getElementById("usersTbody");
@@ -8,9 +7,19 @@ const searchInput = document.getElementById("search");
 
 let allUsers = [];
 
+// helpers
 function setMessage(text, isError = false) {
   msg.textContent = text;
   msg.style.color = isError ? "#ff6b6b" : "#9aa4b2";
+}
+
+function escapeHtml(str) {
+  return String(str)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#039;");
 }
 
 function renderUsers(users) {
@@ -23,20 +32,12 @@ function renderUsers(users) {
   `).join("");
 }
 
-function escapeHtml(str) {
-  return String(str)
-    .replaceAll("&", "&amp;")
-    .replaceAll("<", "&lt;")
-    .replaceAll(">", "&gt;")
-    .replaceAll('"', "&quot;")
-    .replaceAll("'", "&#039;");
-}
-
+// load users
 async function loadUsers() {
   setMessage("Loading users...");
   try {
-    const res = await fetch(`${API_BASE}/users`);
-    if (!res.ok) throw new Error(`GET /users failed: ${res.status}`);
+    const res = await fetch("/api/users");
+    if (!res.ok) throw new Error(`GET /api/users failed: ${res.status}`);
     allUsers = await res.json();
     applyFilter();
     setMessage(`Loaded ${allUsers.length} users.`);
@@ -45,6 +46,7 @@ async function loadUsers() {
   }
 }
 
+// filter users
 function applyFilter() {
   const q = searchInput.value.trim().toLowerCase();
   const filtered = q
@@ -54,9 +56,11 @@ function applyFilter() {
         String(u.id).includes(q)
       )
     : allUsers;
+
   renderUsers(filtered);
 }
 
+// create user
 form.addEventListener("submit", async (e) => {
   e.preventDefault();
   setMessage("Creating user...");
@@ -68,7 +72,7 @@ form.addEventListener("submit", async (e) => {
   };
 
   try {
-    const res = await fetch(`${API_BASE}/users`, {
+    const res = await fetch("/api/users", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
@@ -76,7 +80,7 @@ form.addEventListener("submit", async (e) => {
 
     if (!res.ok) {
       const text = await res.text();
-      throw new Error(`POST /users failed: ${res.status} ${text}`);
+      throw new Error(`POST /api/users failed: ${res.status} ${text}`);
     }
 
     form.reset();
@@ -87,6 +91,7 @@ form.addEventListener("submit", async (e) => {
   }
 });
 
+// events
 refreshBtn.addEventListener("click", loadUsers);
 searchInput.addEventListener("input", applyFilter);
 
